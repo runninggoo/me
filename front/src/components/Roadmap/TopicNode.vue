@@ -1,3 +1,4 @@
+<!-- src/components/Roadmap/TopicNode.vue -->
 <template>
   <div class="topic-node-card" :style="themeStyles">
     <div v-if="data.label" class="title-bar" :style="{ textAlign: data.textAlign || 'left' }">
@@ -6,7 +7,6 @@
     <div v-if="data.description" class="content-area">
       {{ data.description }}
     </div>
-    <div v-if="data.hasStatus" :class="['status-dot', data.status]"></div>
 
     <Handle v-for="pos in ['top', 'right', 'bottom', 'left']" :key="pos" :id="pos" :type="data.handles?.[pos]" :position="Position[pos.charAt(0).toUpperCase() + pos.slice(1)]" />
   </div>
@@ -56,23 +56,6 @@ const themeStyles = computed(() => ({ '--theme-color': theme.value.color }));
   border-top: 1px solid #e5e7eb;
 }
 
-.status-dot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-}
-/* 默认是进行中 */
-.status-dot,
-.status-dot.inprogress {
-  background-color: #f59e0b; /* 黄色: 进行中 */
-}
-.status-dot.done {
-  background-color: #10b981; /* 绿色: 已完成 */
-}
 
 /* 连接点样式 */
 :deep(.vue-flow__handle) {

@@ -216,19 +216,4 @@ const importContent = () => {
   color: #666;
   text-align: right;
 }
-
-.drag-handle-icon {
-  cursor: grab;
-  font-size: 1.2rem;
-  color: #adb5bd;
-  padding: 4px;
-  background: #f8f9fa;
-  border-radius: 4px;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.drag-handle-icon:active {
-  cursor: grabbing;
-}
 </style>

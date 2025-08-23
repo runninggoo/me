@@ -20,7 +20,6 @@ export function useRoadmap(elements) {
 
   const selectedNode = ref(null);
   const selectedEdge = ref(null);
-  const isAddModalOpen = ref(false);
   const isJsonModalOpen = ref(false);
   const jsonModalData = ref('');
   const jsonModalMode = ref('export');
@@ -31,7 +30,6 @@ export function useRoadmap(elements) {
   const isSelectionActive = computed(() => !!(selectedNode.value || selectedEdge.value));
 
   /**
-   * [最终修复] 统一的、安全的节点删除函数，解决了时序问题。
    * @param {object} nodeToDelete 要删除的节点对象
    */
   const deleteNodeAndChildren = (nodeToDelete) => {
@@ -105,7 +103,7 @@ export function useRoadmap(elements) {
     }
     closeContextMenu();
   };
-  
+
   const deleteSelection = () => {
     if (selectedNode.value) {
       deleteNodeAndChildren(selectedNode.value); // 调用修复后的函数
@@ -116,21 +114,21 @@ export function useRoadmap(elements) {
     deselectAll();
   };
 
-  
+
   const deselectAll = () => {
     selectedNode.value = null;
     selectedEdge.value = null;
     getSelectedNodes.value.forEach(n => (n.selected = false));
     getEdges.value.forEach(e => (e.selected = false));
   };
-  
+
   const closeContextMenu = () => {
     if (contextMenu.visible) {
       contextMenu.visible = false;
       contextMenu.targetNode = null;
     }
   };
-  
+
   const onPaneClick = () => {
     deselectAll();
     closeContextMenu();
@@ -138,7 +136,7 @@ export function useRoadmap(elements) {
 
   const onNodeClick = ({ node }) => {
     closeContextMenu();
-    deselectAll(); 
+    deselectAll();
     node.selected = true;
     selectedNode.value = node;
   };
@@ -167,7 +165,7 @@ export function useRoadmap(elements) {
     const groupNodes = allNodes.filter(el => el.type === 'group');
     const nodeMap = {};
     const tree = [];
-    
+
     const nodesToExclude = new Set();
     const targetNodeId = nodeToTransfer.value?.id;
 
@@ -235,16 +233,12 @@ export function useRoadmap(elements) {
     nodeToTransfer.value = null;
   };
 
-  const openAddModal = () => {
-    isAddModalOpen.value = true;
-  };
-
   const addNode = (type) => {
     const position = screenToFlowCoordinate({
       x: window.innerWidth / 2.2,
       y: window.innerHeight / 3,
     });
-    
+
     const newNode = {
       id: `${type}-${uuidv4()}`,
       type,
@@ -270,6 +264,13 @@ export function useRoadmap(elements) {
       propertyTarget[key] = value;
     }
   };
+
+  //由于onElementPropertyUpdate是通过当前选中节点实现 
+  //而某些节点如task节点再未选择的情况下也需要交互 因此写一个带id的函数
+  const patchNode = ({ id, patch }) => {
+    const idx = elements.value.findIndex(el => el.id === id)
+    ~idx && Object.assign(elements.value[idx].data, patch)
+  }
 
   const isValidConnection = (connection) => {
     const sourceNode = findNode(connection.source);
@@ -309,7 +310,6 @@ export function useRoadmap(elements) {
     selectedNode,
     selectedEdge,
     isSelectionActive,
-    isAddModalOpen,
     isJsonModalOpen,
     jsonModalData,
     jsonModalMode,
@@ -319,7 +319,7 @@ export function useRoadmap(elements) {
     onConnect,
     isValidConnection,
     onElementPropertyUpdate,
-    openAddModal,
+    patchNode,
     addNode,
     deleteSelection,
     deselectAll,

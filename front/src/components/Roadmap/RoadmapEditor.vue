@@ -1,7 +1,6 @@
+<!-- src/components/Roadmap/RoadmapEditor.vue -->
 <template>
-  <!-- 整个编辑器：Toolbar + 画布区域，占满视口，无滚动条 -->
   <div class="editor-wrapper">
-    <!-- 1️⃣ 顶部固定 Toolbar -->
     <EditorToolbar
       :is-selection-active="isSelectionActive"
       :helper-lines-active="showHelperLines"
@@ -10,8 +9,6 @@
       @open-json-modal="openJsonModal"
       @add="addNode" 
     />
-
-    <!-- 2️⃣ 画布区域：占剩余全部高度 -->
     <div class="editor-body">
       <VueFlow
         v-model="elements"
@@ -25,26 +22,23 @@
         @node-context-menu="onNodeContextMenu"
         @pane-context-menu="onPaneContextMenu"
       >
-        <!-- 节点模板 -->
         <template #node-text="props"><TextNode v-bind="props" /></template>
         <template #node-topic="props"><TopicNode v-bind="props" /></template>
         <template #node-task="props">
           <TaskNode
             v-bind="props"
-            @updateNodeData="d => onElementPropertyUpdate({ target:'node', key:null, value:d })"
+            @updateNodeData="patch => patchNode({ id: props.id, patch })"
           />
         </template>
         <template #node-list="props">
           <ListNode
             v-bind="props"
-            @updateNodeData="d => onElementPropertyUpdate({ target:'node', key:null, value:d })"
+            @updateNodeData="patch => patchNode({ id: props.id, patch })"
           />
         </template>
         <template #node-group="props">
           <GroupNode v-bind="props" @resize="onNodeResize" />
         </template>
-
-        <!-- 背景、控制器、小地图 -->
         <Background bg-color="#fafafa" />
         <Controls />
         <MiniMap
@@ -54,10 +48,8 @@
         />
       </VueFlow>
 
-      <!-- 辅助线（仅当开启时渲染） -->
       <HelperLines v-if="showHelperLines" />
 
-      <!-- 右键菜单（绝对定位，不影响滚动） -->
       <ContextMenu
         :visible="contextMenu.visible"
         :position="contextMenu.position"
@@ -65,7 +57,6 @@
       />
     </div>
 
-    <!-- 3️⃣ 浮层/侧边栏：绝对定位，不占流 -->
     <NodeEditorSidebar
       v-if="selectedNode"
       :model-value="selectedNode.data"
@@ -141,6 +132,7 @@ const {
   onConnect,
   isValidConnection,
   onElementPropertyUpdate,
+  patchNode,
   addNode,
   deleteSelection,
   deselectAll,
@@ -179,8 +171,9 @@ function onNodeResize({ id, width, height }) {
 .editor-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;     
-  overflow: hidden;   
+  height: 100%;     
+  overflow: hidden;  
+  
 }
 
 .editor-body {

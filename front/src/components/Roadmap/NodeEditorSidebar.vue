@@ -1,3 +1,4 @@
+<!-- src/components/Roadmap/NodeeditorSidebar.vue -->
 <template>
   <aside class="editor-sidebar" v-if="modelValue && nodeType">
     <div class="sidebar-header">
@@ -82,7 +83,6 @@ import { NodeTypes, ColorThemes } from 'src/data/RoadmapnodeDefinitions';
 const props = defineProps({ modelValue: Object, nodeType: String });
 const emit = defineEmits(['update:property', 'close']);
 
-// 1. 定义全新的、更详细的 UI Schema
 const nodeSchema = {
   [NodeTypes.TEXT]: [
     { key: 'label', type: 'textarea', label: '文本内容', rows: 4 },
@@ -106,18 +106,15 @@ const nodeSchema = {
         { value: 'left', text: '居左' }, { value: 'center', text: '居中' }, { value: 'right', text: '居右' }
       ]
     },
-    { key: 'hasStatus', type: 'checkbox', checkboxLabel: '显示状态点' },
-    {
-      key: 'status', type: 'select', label: '状态', options: [
-        { value: 'inprogress', text: '进行中' }, { value: 'done', text: '已完成' }
-      ], condition: (data) => data.hasStatus
-    }, // 添加条件渲染
     { key: 'color' }, // 标记字段存在，但由下面特殊区域渲染
     { key: 'handles' },
   ],
   [NodeTypes.TASK]: [
     { key: 'label', type: 'text', label: '按钮文字' },
     { key: 'url', type: 'text', label: '目标网址 (URL)', placeholder: 'https://...' },
+    { key: 'status', type: 'button-group', label: '状态', options: [
+    { value: 'todo', text: '待办' },
+    { value: 'done', text: '完成' }] },
     { key: 'color' },
     { key: 'handles' },
   ],
@@ -152,7 +149,7 @@ const hasField = (fieldKey) => {
 
 const emitUpdate = (key, value) => emit('update:property', { target: 'node', key, value });
 
-// --- 以下是复杂字段的逻辑，保持不变 ---
+
 // 列表项逻辑
 const updateItems = (newItems) => emitUpdate('items', newItems);
 const toggleItemStatus = (index) => {
@@ -184,20 +181,20 @@ const cycleHandleState = (pos) => {
 
 <style scoped>
 .editor-sidebar {
-  position: fixed;          /* 关键：相对视口固定，不随画布滚动 */
+  position: fixed;
   top: 0;
   right: 0;
-  height: 100vh;            /* 占满视口高度 */
+  height: 100vh;
   width: 340px;
-  max-width: 100vw;         /* 关键：永远不超过视口宽度 */
-  box-sizing: border-box;   /* padding/border 不再额外占宽 */
+  max-width: 100vw;
+  box-sizing: border-box;
   background-color: #ffffff;
   border-left: 1px solid #e2e8f0;
   box-shadow: -2px 0 16px rgba(0, 0, 0, 0.05);
   z-index: 20;
   display: flex;
   flex-direction: column;
-  overflow: hidden;         /* 整体不滚动 */
+  overflow: hidden;
 }
 
 .sidebar-header {
@@ -214,8 +211,8 @@ const cycleHandleState = (pos) => {
 
 .sidebar-content {
   flex: 1 1 0;
-  overflow-y: auto;   /* 仅纵向滚动 */
-  overflow-x: hidden; /* 强制去掉横向滚动条 */
+  overflow-y: auto; 
+  overflow-x: hidden;
   padding: 20px 30px;
 }
 

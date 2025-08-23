@@ -1,3 +1,4 @@
+// data/RoadmapnodeDefinitions.js
 import { v4 as uuidv4 } from 'uuid';
 
 // 节点类型定义保持不变
@@ -31,7 +32,7 @@ export function createNodeData(type, overrides = {}) {
       return { label: '文本', variant: 'title', width: 200, textAlign: 'left', ...overrides };
     
     case NodeTypes.TOPIC:
-      return { ...baseData, label: '新话题', description: '这是一个核心话题...', color: ColorThemes.BLUE.value, textAlign: 'left', hasStatus: true, status: 'inprogress', ...overrides };
+      return { ...baseData, label: '新话题', description: '这是一个核心话题...', color: ColorThemes.BLUE.value, textAlign: 'left', ...overrides };
 
     case NodeTypes.TASK:
       return { ...baseData, label: '新任务', url: '', color: ColorThemes.GREEN.value, hasStatus: true, status: 'todo', ...overrides };

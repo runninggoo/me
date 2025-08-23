@@ -1,6 +1,6 @@
 // src/components/Mindmap/Mindmapeditor.vue
 <script setup>
-import { onMounted, ref, nextTick } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useMindMap } from '../../composables/useMindMap';
 import Toolbar from './Toolbar.vue';
 import ContextMenu from './ContextMenu.vue';
@@ -39,12 +39,8 @@ const mindMapContainer = ref(null);
 
 onMounted(() => {
   if (mindMapContainer.value) {
-    init(mindMapContainer.value);
+    init(mindMapContainer.value, props.modelValue);
   }
-  // 首次把父组件给的 JSON 写进去
-  nextTick(() => props.modelValue && setDataJson(props.modelValue))
-
-  // 监听任何改动，回传最新 JSON
   mindMap.value?.on('data_change', () => {
     emit('update:model-value', getDataJson())
   })
@@ -84,11 +80,14 @@ onMounted(() => {
 .mindmap-editor-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   overflow: hidden;
 }
 .mindmap-container {
-  flex-grow: 1; 
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 </style>

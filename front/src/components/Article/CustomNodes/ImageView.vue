@@ -6,6 +6,7 @@ import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3';
 const props = defineProps(nodeViewProps);
 
 const changeSize = (delta) => {
+  if (!props.editor.isEditable) return;
   const current = parseInt(props.node.attrs.width, 10) || 80
   const newWidth = Math.max(20, current + delta)
 
@@ -26,7 +27,7 @@ const changeSize = (delta) => {
       :style="{ width: props.node.attrs.width }" class="inline-image"
       :class="{ 'ProseMirror-selectednode': props.selected }" />
 
-    <div v-if="props.selected" class="zoom-toolbar">
+    <div v-if="props.selected && props.editor.isEditable" class="zoom-toolbar">
       <button @mousedown="changeSize(-10); ">-</button>
       <button @mousedown="changeSize(10); ">+</button>
     </div>
@@ -39,8 +40,6 @@ const changeSize = (delta) => {
   position: relative;
   line-height: 0;
   vertical-align: middle;
-  /* 关键修正：移除 user-select: none，它会阻止拖拽的启动 */
-  /* user-select: none; */
 }
 
 .inline-image {
@@ -64,7 +63,6 @@ const changeSize = (delta) => {
   border-radius: 5px;
   padding: 2px;
   z-index: 10;
-  /* 这里的 user-select: none 是安全的，因为它只作用于按钮上 */
   user-select: none;
 
   button {

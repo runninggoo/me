@@ -12,10 +12,10 @@ import Select from 'simple-mind-map/src/plugins/Select.js';
 //theme
 import Themes from 'simple-mind-map-plugin-themes';
 import themeList from 'simple-mind-map-plugin-themes/themeList';
-// 注册拖拽与选择插件
+
 MindMap.usePlugin(Drag).usePlugin(Select).usePlugin(MiniMap);
 
-// 正确注册主题（不要用 usePlugin）
+//注册主题
 Themes.init(MindMap);
 
 export function useMindMap() {
@@ -34,15 +34,35 @@ export function useMindMap() {
     isContextMenuVisible.value = false;
   };
 
-  const init = (containerEl) => {
+  const init = (containerEl, initialData) => {
+    let dataForConstructor = { 
+      data: { text: "根节点" },
+      children: []
+    };
+
+    if (initialData) {
+      if (initialData.root) {
+        dataForConstructor = initialData.root;
+      } else {
+        dataForConstructor = initialData;
+      }
+    }
+
     mindMap.value = new MindMap({
       el: containerEl,
-      data: {
-        data: { text: "根节点" },
-        children: []
-      },
+      data: dataForConstructor,
       defaultTheme: 'default',
     });
+
+    if (initialData && initialData.root) {
+        if(initialData.layout) {
+            mindMap.value.setLayout(initialData.layout);
+        }
+        if(initialData.theme && initialData.theme.template) {
+            mindMap.value.setTheme(initialData.theme.template);
+        }
+    }
+
     isMindMapReady.value = true;
     mindMap.value.on('node_contextmenu', (e) => {
       showContextMenu(e, true);
@@ -53,10 +73,8 @@ export function useMindMap() {
   };
 
   onBeforeUnmount(() => {
-    // --- 新增：解绑事件 ---
     mindMap.value?.off('node_contextmenu', showContextMenu);
     mindMap.value?.off('contextmenu', showContextMenu);
-    // --- 结束 ---
     mindMap.value?.destroy();
   });
 

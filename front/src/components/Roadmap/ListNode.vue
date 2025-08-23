@@ -1,8 +1,9 @@
+<!-- src/components/Roadmap/ListNode.vue -->
 <template>
   <div class="list-node-card" :style="themeStyles">
     <div class="title-bar">{{ data.label }}</div>
     <ul v-if="data.items?.length" class="list-items">
-      <li v-for="(item, index) in data.items" :key="item.id" :class="{ 'is-done': item.status === 'done' }" class="nodrag" @click="toggleItemStatus(index)" >
+      <li v-for="(item, index) in data.items" :key="item.id" :class="{ 'is-done': item.status === 'done' }" @click.stop="toggleItemStatus(index)" >
         <span class="checkbox"></span>
         <span>{{ item.label }}</span>
       </li>
@@ -18,22 +19,16 @@ import { Handle, Position } from '@vue-flow/core';
 import { ColorThemes } from 'src/data/RoadmapnodeDefinitions';
 
 const props = defineProps({ data: Object });
-// FIX 2: Define the emits event, similar to TaskNode.vue
 const emit = defineEmits(['updateNodeData']);
 
 const theme = computed(() => ColorThemes[props.data.color?.toUpperCase()] || ColorThemes.PURPLE);
 const themeStyles = computed(() => ({ '--theme-color': theme.value.color }));
 
-// FIX 3: Implement the missing click handler function
 const toggleItemStatus = (index) => {
-  // Create a deep copy to avoid directly mutating the prop
   const newItems = JSON.parse(JSON.stringify(props.data.items));
   const currentStatus = newItems[index].status;
   
-  // Toggle the status
   newItems[index].status = currentStatus === 'done' ? 'todo' : 'done';
-
-  // Emit the update event to the parent (RoadmapEditor.vue), which will update the main 'elements' state
   emit('updateNodeData', { items: newItems });
 };
 </script>
@@ -65,7 +60,6 @@ li {
   align-items: center; 
   gap: 8px; 
   font-size: 14px;
-  /* FIX 4: Add cursor pointer for better user experience */
   cursor: pointer;
 }
 .checkbox { 
