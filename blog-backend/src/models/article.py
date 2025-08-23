@@ -29,12 +29,20 @@ class Article(db.Model):
     
     def set_content(self, content_dict):
         """设置内容（将字典转换为JSON字符串）"""
-        self.content = json.dumps(content_dict, ensure_ascii=False)
+        if isinstance(content_dict, dict):
+            self.content = json.dumps(content_dict, ensure_ascii=False)
+        else:
+            self.content = content_dict
     
     def get_content(self):
         """获取内容（将JSON字符串转换为字典）"""
         try:
-            return json.loads(self.content) if self.content else {}
+            if isinstance(self.content, str):
+                return json.loads(self.content) if self.content else {}
+            elif isinstance(self.content, dict):
+                return self.content
+            else:
+                return {}
         except json.JSONDecodeError:
             return {}
     
@@ -51,6 +59,7 @@ class Article(db.Model):
             'title': self.title,
             'excerpt': self.excerpt,
             'status': self.status,
+            'author': self.author.to_dict() if self.author else None,
             'is_tag_article': self.is_tag_article,
             'roadmap_id': self.roadmap_id,
             'mindmap_id': self.mindmap_id,
@@ -58,7 +67,6 @@ class Article(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'published_at': self.published_at.isoformat() if self.published_at else None,
-            'author': self.author.to_dict() if self.author else None,
             'tags': [tag.to_dict() for tag in self.tags] if self.tags else []
         }
         
@@ -67,4 +75,3 @@ class Article(db.Model):
             data['content_html'] = self.content_html
             
         return data
-

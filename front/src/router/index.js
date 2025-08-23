@@ -69,6 +69,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+  path: '/roadmap/:id',
+  name: 'RoadmapDetail',
+  component: () => import('../views/RoadmapDetail.vue'), 
+  meta: { requiresAuth: false }
+  },
+  {
     path: '/mindmap/new',
     name: 'NewMindmap',
     component: MindmapEditor,
@@ -80,6 +86,12 @@ const routes = [
     component: MindmapEditor,
     meta: { requiresAuth: true }
   },
+  {
+  path: '/mindmap/:id',
+  name: 'MindmapDetail',
+  component: () => import('../views/MindmapDetail.vue'), 
+  meta: { requiresAuth: false } 
+},
   {
     path: '/profile',
     name: 'Profile',

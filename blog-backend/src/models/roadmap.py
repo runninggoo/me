@@ -17,6 +17,7 @@ class Roadmap(db.Model):
     published_at = db.Column(db.DateTime, nullable=True)
     
     # 关系
+    author = db.relationship('User', backref='user_roadmaps', lazy=True)
     tags = db.relationship('Tag', secondary='roadmap_tags', backref='roadmaps', lazy=True)
     linked_articles = db.relationship('Article', backref='linked_roadmap', lazy=True)
     
@@ -47,11 +48,11 @@ class Roadmap(db.Model):
             'title': self.title,
             'description': self.description,
             'status': self.status,
+            'author': self.author.to_dict() if self.author else None,
             'view_count': self.view_count,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'published_at': self.published_at.isoformat() if self.published_at else None,
-            'author': self.author.to_dict() if self.author else None,
             'tags': [tag.to_dict() for tag in self.tags] if self.tags else []
         }
         

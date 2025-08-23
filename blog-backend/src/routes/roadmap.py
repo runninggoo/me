@@ -72,6 +72,7 @@ def get_roadmaps():
         }), 500
 
 @roadmap_bp.route('/<int:roadmap_id>', methods=['GET'])
+@jwt_required()
 def get_roadmap(roadmap_id):
     """获取路线图详情"""
     try:
@@ -87,14 +88,15 @@ def get_roadmap(roadmap_id):
         # 只有已发布的路线图或作者本人可以查看
         current_user_id = None
         try:
-            current_user_id = get_jwt_identity()
+            current_user_id = int(get_jwt_identity())
+            print(get_jwt_identity())
         except:
             pass
         
         if roadmap.status != 'published' and roadmap.user_id != current_user_id:
             return jsonify({
                 'success': False,
-                'error': '无权访问此路线图',
+                'error': '无权访问此路线图'+str(roadmap.user_id)+str(current_user_id),
                 'code': 403
             }), 403
         
@@ -122,7 +124,7 @@ def get_roadmap(roadmap_id):
 def create_roadmap():
     """创建路线图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json()
         
         # 验证必填字段
@@ -187,7 +189,7 @@ def create_roadmap():
 def update_roadmap(roadmap_id):
     """更新路线图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         roadmap = Roadmap.query.get(roadmap_id)
         
         if not roadmap:
@@ -250,7 +252,7 @@ def update_roadmap(roadmap_id):
 def delete_roadmap(roadmap_id):
     """删除路线图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         roadmap = Roadmap.query.get(roadmap_id)
         
         if not roadmap:

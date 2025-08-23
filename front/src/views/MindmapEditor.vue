@@ -150,6 +150,7 @@
 </template>
 
 <script setup>
+import { initialMindmap } from 'src/data/initial-elements.js'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
@@ -168,7 +169,7 @@ const lastSaved = ref('')
 // 思维导图数据
 const mindmapTitle = ref('')
 const mindmapDescription = ref('')
-const mindmapContent = ref({})
+const mindmapContent = ref(initialMindmap)
 const mindmapStatus = ref('draft')
 
 // 标签管理
@@ -237,7 +238,7 @@ const saveMindmap = async (status = null) => {
   if (isEditing.value) {
     mindmapData.id = parseInt(route.params.id)
   }
-
+  console.log(mindmapData)
   const result = await contentStore.saveMindmap(mindmapData)
   
   if (result.success) {

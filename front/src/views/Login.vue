@@ -87,7 +87,12 @@ const handleLogin = async () => {
   try {
     const result = await authStore.login(form.value)
     if (result.success) {
-      router.push('/dashboard')
+      // 登录成功后重定向到仪表板或管理员页面
+      if (authStore.currentUser && authStore.currentUser.is_admin) {
+        router.push('/admin/dashboard')
+      } else {
+        router.push('/dashboard')
+      }
     } else {
       error.value = result.message
     }

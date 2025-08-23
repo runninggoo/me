@@ -320,10 +320,10 @@ const deleteContent = async (type, id) => {
         result = await contentStore.deleteArticle(id)
         break
       case 'roadmap':
-        // TODO: 实现路线图删除
+        result = await contentStore.deleteRoadmap(id)
         break
       case 'mindmap':
-        // TODO: 实现思维导图删除
+        result = await contentStore.deleteMindmap(id)
         break
     }
 

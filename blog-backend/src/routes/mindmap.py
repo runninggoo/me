@@ -72,6 +72,7 @@ def get_mindmaps():
         }), 500
 
 @mindmap_bp.route('/<int:mindmap_id>', methods=['GET'])
+@jwt_required()
 def get_mindmap(mindmap_id):
     """获取思维导图详情"""
     try:
@@ -87,7 +88,7 @@ def get_mindmap(mindmap_id):
         # 只有已发布的思维导图或作者本人可以查看
         current_user_id = None
         try:
-            current_user_id = get_jwt_identity()
+            current_user_id = int(get_jwt_identity())
         except:
             pass
         
@@ -122,7 +123,7 @@ def get_mindmap(mindmap_id):
 def create_mindmap():
     """创建思维导图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json()
         
         # 验证必填字段
@@ -187,7 +188,7 @@ def create_mindmap():
 def update_mindmap(mindmap_id):
     """更新思维导图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         mindmap = Mindmap.query.get(mindmap_id)
         
         if not mindmap:
@@ -250,7 +251,7 @@ def update_mindmap(mindmap_id):
 def delete_mindmap(mindmap_id):
     """删除思维导图"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         mindmap = Mindmap.query.get(mindmap_id)
         
         if not mindmap:
@@ -263,7 +264,7 @@ def delete_mindmap(mindmap_id):
         if mindmap.user_id != user_id:
             return jsonify({
                 'success': False,
-                'error': '无权删除此思维导图',
+                'error': '无权删除此思维导图'+str(type(mindmap.user_id))+"!="+str(type(user_id)),
                 'code': 403
             }), 403
         

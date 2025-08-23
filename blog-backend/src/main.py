@@ -57,6 +57,8 @@ def create_app():
     with app.app_context():
         # 确保上传目录存在
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        # 确保静态目录存在
+        os.makedirs(app.static_folder, exist_ok=True)
         db.create_all()
         create_default_admin()
     
@@ -64,13 +66,19 @@ def create_app():
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve(path):
+        # 排除API路由
+        if path.startswith('api/'):
+            return "API route not found", 404
+            
         static_folder_path = app.static_folder
         if static_folder_path is None:
             return "Static folder not configured", 404
 
+        # 检查请求的路径是否对应静态文件
         if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
             return send_from_directory(static_folder_path, path)
         else:
+            # 对于所有其他路由，返回index.html（由Vue Router处理）
             index_path = os.path.join(static_folder_path, 'index.html')
             if os.path.exists(index_path):
                 return send_from_directory(static_folder_path, 'index.html')
@@ -118,4 +126,3 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
-

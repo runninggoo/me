@@ -117,6 +117,7 @@ export const useContentStore = defineStore('content', {
       }
     },
 
+
     // 路线图相关操作
     async loadRoadmaps(params = {}) {
       this.loading = true
@@ -178,7 +179,21 @@ export const useContentStore = defineStore('content', {
         this.saving = false
       }
     },
-
+    async deleteRoadmap(id) {
+      try {
+        const response = await roadmapAPI.deleteRoadmap(id)
+        if (response.success) {
+          this.roadmaps = this.roadmaps.filter(a => a.id !== id)
+          if (this.currentRoadmap?.id === id) {
+            this.currentRoadmap = null
+          }
+        }
+        return response
+      } catch (error) {
+        console.error('删除路线图失败:', error)
+        return { success: false, error: error.error || '删除失败' }
+      }
+    },
     // 思维导图相关操作
     async loadMindmaps(params = {}) {
       this.loading = true
@@ -241,6 +256,21 @@ export const useContentStore = defineStore('content', {
       }
     },
 
+    async deleteMindmap(id) {
+      try {
+        const response = await mindmapAPI.deleteMindmap(id)
+        if (response.success) {
+          this.mindmaps = this.mindmaps.filter(a => a.id !== id)
+          if (this.currentMindmap?.id === id) {
+            this.currentMindmap = null
+          }
+        }
+        return response
+      } catch (error) {
+        console.error('删除思维导图失败:', error)
+        return { success: false, error: error.error || '删除失败' }
+      }
+    },
     // 标签相关操作
     async loadTags(userId) {
       try {

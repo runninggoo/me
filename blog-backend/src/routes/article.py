@@ -90,7 +90,7 @@ def get_article(article_id):
         try:
             from flask_jwt_extended import verify_jwt_in_request
             verify_jwt_in_request(optional=True)
-            current_user_id = get_jwt_identity()
+            current_user_id = int(get_jwt_identity())
             if current_user_id:
                 current_user_id = int(current_user_id)
         except:
@@ -333,7 +333,7 @@ def delete_article(article_id):
 def publish_article(article_id):
     """发布文章"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         article = Article.query.get(article_id)
         
         if not article:

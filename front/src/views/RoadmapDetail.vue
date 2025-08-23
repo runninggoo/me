@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- 导航栏 -->
     <nav class="bg-white shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -42,13 +41,12 @@
       </div>
     </nav>
 
-    <SimplePaywallModal 
+<SimplePaywallModal 
   v-if="showPaywall && !hasPaid" 
   @pay="handlePayment" 
   @close="handleClosePaywall" 
 />
 
-    <!-- 主内容 -->
     <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -65,37 +63,30 @@
         </router-link>
       </div>
 
-      <article v-else-if="article" class="bg-white shadow rounded-lg overflow-hidden">
-        <!-- 文章头部 -->
+      <article v-else-if="roadmap" class="bg-white shadow rounded-lg overflow-hidden">
         <div class="px-6 py-8 border-b border-gray-200">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center text-sm text-gray-500">
-              <span>{{ formatDate(article.created_at) }}</span>
+              <span>{{ formatDate(roadmap.created_at) }}</span>
               <span class="mx-2">•</span>
-              <span>{{ article.view_count }} 次浏览</span>
-              <span v-if="article.author" class="mx-2">•</span>
-              <span v-if="article.author">作者：{{ article.author.display_name || article.author.username }}</span>
+              <span v-if="roadmap.author">作者：{{ roadmap.author.display_name || roadmap.author.username }}</span>
             </div>
             <div v-if="canEdit" class="flex space-x-2">
               <router-link 
-                :to="`/article/${article.id}/edit`"
+                :to="`/roadmap/${roadmap.id}/edit`"
                 class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
               >
                 编辑
               </router-link>
             </div>
           </div>
-          
-          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ article.title }}</h1>
-          
-          <div v-if="article.excerpt" class="text-lg text-gray-600 mb-4">
-            {{ article.excerpt }}
+          <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ roadmap.title }}</h1>
+          <div v-if="roadmap.description" class="text-lg text-gray-600 mb-4">
+            {{ roadmap.description }}
           </div>
-
-          <!-- 标签 -->
-          <div v-if="article.tags && article.tags.length > 0" class="flex flex-wrap gap-2">
+          <div v-if="roadmap.tags && roadmap.tags.length > 0" class="flex flex-wrap gap-2">
             <span 
-              v-for="tag in article.tags" 
+              v-for="tag in roadmap.tags" 
               :key="tag.id"
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
             >
@@ -104,17 +95,11 @@
           </div>
         </div>
 
-        <!-- 文章内容 -->
-        <div class="px-6 py-8" v-if="hasPaid || !isOtherUserContent">
-  <div v-if="article.content" class="prose prose-lg max-w-none">
-    <TipTapViewer v-model="article.content" />
+        <div class="px-6 py-8">
+  <div v-if="roadmap.content && (hasPaid || !isOtherUserContent)" style="height: 70vh;">
+    <RoadmapViewer v-model="roadmap.content" />
   </div>
-  <div v-else class="text-gray-500 italic">
-    暂无内容
-  </div>
-</div>
-<div v-else class="px-6 py-8">
-  <div class="text-center py-12">
+  <div v-else-if="!hasPaid && isOtherUserContent" class="text-center py-12">
     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
@@ -129,32 +114,10 @@
       立即支付
     </button>
   </div>
+  <div v-else class="text-gray-500 italic">
+    暂无内容
+  </div>
 </div>
-
-        <!-- 关联内容 -->
-       <div v-if="hasRelatedContent && (hasPaid || !isOtherUserContent)" class="px-6 py-6 bg-gray-50 border-t border-gray-200">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">相关内容</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-if="article.roadmap_id" class="bg-white p-4 rounded-lg border">
-              <h4 class="font-medium text-gray-900 mb-2">关联路线图</h4>
-              <router-link 
-                :to="`/roadmap/${article.roadmap_id}`"
-                class="text-indigo-600 hover:text-indigo-800"
-              >
-                查看路线图
-              </router-link>
-            </div>
-            <div v-if="article.mindmap_id" class="bg-white p-4 rounded-lg border">
-              <h4 class="font-medium text-gray-900 mb-2">关联思维导图</h4>
-              <router-link 
-                :to="`/mindmap/${article.mindmap_id}`"
-                class="text-indigo-600 hover:text-indigo-800"
-              >
-                查看思维导图
-              </router-link>
-            </div>
-          </div>
-        </div>
       </article>
     </main>
   </div>
@@ -162,38 +125,33 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
 import { useContentStore } from '../stores/content.js'
-import TipTapViewer from '../components/Article/TipTapViewer.vue'
+import RoadmapViewer from '../components/Roadmap/RoadmapViewer.vue' 
 import SimplePaywallModal from '../components/SimplePaywallModal.vue'
 
 const showPaywall = ref(false)
 const hasPaid = ref(false)
 
 const route = useRoute()
-const router = useRouter()
 const authStore = useAuthStore()
 const contentStore = useContentStore()
 
 const loading = ref(true)
 const error = ref('')
-const article = ref(null)
+const roadmap = ref(null)
 
 const canEdit = computed(() => {
   return authStore.isAuthenticated && 
-         article.value && 
-         article.value.user_id === authStore.user?.id
-})
-
-const hasRelatedContent = computed(() => {
-  return article.value && (article.value.roadmap_id || article.value.mindmap_id)
+         roadmap.value && 
+         roadmap.value.user_id === authStore.user?.id
 })
 
 const isOtherUserContent = computed(() => {
   return authStore.isAuthenticated && 
-         article.value && 
-         article.value.user_id !== authStore.user?.id
+         roadmap.value && 
+         roadmap.value.user_id !== authStore.user?.id
 })
 
 const handlePayment = () => {
@@ -217,111 +175,37 @@ const formatDate = (dateString) => {
   })
 }
 
-const loadArticle = async () => {
-  const articleId = parseInt(route.params.id)
-  if (!articleId) {
-    error.value = '无效的文章ID'
+const loadRoadmap = async () => {
+  const roadmapId = parseInt(route.params.id)
+  if (!roadmapId) {
+    error.value = '无效的路线图ID'
     loading.value = false
     return
   }
 
   try {
-    const result = await contentStore.loadArticle(articleId)
+    const result = await contentStore.loadRoadmap(roadmapId)
     if (result.success) {
-  article.value = result.data
+  roadmap.value = result.data
   if (isOtherUserContent.value) {
     showPaywall.value = true
   }
-}else {
-      error.value = result.error || '文章不存在'
+} else {
+      error.value = result.error || '路线图不存在'
     }
   } catch (err) {
-    error.value = '加载文章失败'
-    console.error('加载文章失败:', err)
+    error.value = '加载路线图失败'
+    console.error('加载路线图失败:', err)
   } finally {
     loading.value = false
   }
 }
 
 onMounted(() => {
-  loadArticle()
+  loadRoadmap()
 })
 </script>
 
 <style scoped>
-.prose {
-  color: #374151;
-  line-height: 1.75;
-}
 
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  color: #111827;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.prose h1 { font-size: 2.25rem; margin-top: 0; margin-bottom: 0.8888889em; }
-.prose h2 { font-size: 1.875rem; margin-top: 2em; margin-bottom: 1em; }
-.prose h3 { font-size: 1.5rem; margin-top: 1.6em; margin-bottom: 0.6em; }
-
-.prose p {
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
-}
-
-.prose blockquote {
-  font-weight: 500;
-  font-style: italic;
-  color: #374151;
-  border-left-width: 0.25rem;
-  border-left-color: #d1d5db;
-  quotes: "\201C""\201D""\2018""\2019";
-  margin-top: 1.6em;
-  margin-bottom: 1.6em;
-  padding-left: 1em;
-}
-
-.prose ul, .prose ol {
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
-  padding-left: 1.625em;
-}
-
-.prose li {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-
-.prose pre {
-  color: #374151;
-  background-color: #f3f4f6;
-  overflow-x: auto;
-  font-weight: 400;
-  font-size: 0.875em;
-  line-height: 1.7142857;
-  margin-top: 1.7142857em;
-  margin-bottom: 1.7142857em;
-  border-radius: 0.375rem;
-  padding-top: 0.8571429em;
-  padding-right: 1.1428571em;
-  padding-bottom: 0.8571429em;
-  padding-left: 1.1428571em;
-}
-
-.prose code {
-  color: #111827;
-  font-weight: 600;
-  font-size: 0.875em;
-}
-
-.prose a {
-  color: #3b82f6;
-  text-decoration: underline;
-  font-weight: 500;
-}
-
-.prose a:hover {
-  color: #1d4ed8;
-}
 </style>
-
